@@ -1,15 +1,16 @@
 // ==============================================
-// ضع مفتاح ImgBB هنا (مجاني من imgbb.com)
+// ضع مفتاح ImgBB هنا
 // ==============================================
 const IMGBB_API_KEY = "753d9cfad92e1cf2e87bcd0ba74dc0bf";
 
 let currentLang = localStorage.getItem("lang") || "ar";
+let currentTheme = localStorage.getItem("theme") || "dark";
 let selectedFiles = [];
 
 const translations = {
   ar: {
     title: "رفع الصور",
-    subtitle: "ارفع صورك واحصل على روابط مباشرة",
+    subtitle: "ارفع صورك بسهولة واحصل على روابط مباشرة جاهزة للاستخدام",
     drop: "اسحب الصور هنا أو اضغط للاختيار",
     select: "اختيار صور",
     upload: "رفع الصور",
@@ -19,17 +20,17 @@ const translations = {
     copyAll: "نسخ جميع الروابط",
     downloadTxt: "تحميل ملف TXT",
     newUpload: "رفع صور جديدة",
-    noImages: "لم يتم اختيار أي صور",
-    invalidType: "يُسمح فقط بـ JPEG و PNG و WebP",
-    tooMany: "الحد الأقصى 15 صورة في المرة",
+    noImages: "لم يتم اختيار أي صور بعد",
+    invalidType: "يُسمح فقط بصور JPEG و PNG و WebP",
+    tooMany: "الحد الأقصى 15 صورة في المرة الواحدة",
     tooLarge: "حجم الملف أكبر من 10 ميجابايت",
-    error: "فشل الرفع",
+    error: "حدث خطأ أثناء الرفع",
     urlsTitle: "الروابط المباشرة",
-    keyMissing: "ضع مفتاح ImgBB في ملف app.js أولاً"
+    keyMissing: "من فضلك ضع مفتاح ImgBB في ملف app.js"
   },
   en: {
     title: "Upload Images",
-    subtitle: "Upload images and get direct URLs",
+    subtitle: "Upload your images easily and get direct, ready-to-use URLs",
     drop: "Drag images here or click to select",
     select: "Select Images",
     upload: "Upload Images",
@@ -38,19 +39,26 @@ const translations = {
     copy: "Copy",
     copyAll: "Copy All URLs",
     downloadTxt: "Download TXT",
-    newUpload: "Upload More",
-    noImages: "No images selected",
-    invalidType: "Only JPEG, PNG and WebP allowed",
+    newUpload: "Upload More Images",
+    noImages: "No images selected yet",
+    invalidType: "Only JPEG, PNG and WebP are allowed",
     tooMany: "Maximum 15 images at once",
-    tooLarge: "File larger than 10MB",
-    error: "Upload failed",
+    tooLarge: "File is larger than 10MB",
+    error: "An error occurred during upload",
     urlsTitle: "Direct Image URLs",
-    keyMissing: "Please put your ImgBB API key in app.js"
+    keyMissing: "Please add your ImgBB API key in app.js"
   }
 };
 
 function t(key) {
   return translations[currentLang][key] || key;
+}
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+  document.getElementById("themeIcon").textContent = theme === "dark" ? "🌙" : "☀️";
 }
 
 function setLang(lang) {
@@ -63,6 +71,7 @@ function setLang(lang) {
 }
 
 document.getElementById("langToggle").onclick = () => setLang(currentLang === "ar" ? "en" : "ar");
+document.getElementById("themeToggle").onclick = () => applyTheme(currentTheme === "dark" ? "light" : "dark");
 
 function render() {
   if (window.location.hash === "#results") renderResults();
@@ -71,22 +80,28 @@ function render() {
 
 function renderUpload() {
   document.getElementById("app").innerHTML = `
-    <div class="text-center mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold mb-3">${t("title")}</h1>
-      <p class="text-gray-400">${t("subtitle")}</p>
+    <div class="text-center mb-10 fade-in">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">${t("title")}</h1>
+      <p class="text-muted text-lg max-w-xl mx-auto">${t("subtitle")}</p>
     </div>
-    <div class="card p-6 md:p-8">
-      <div id="dropzone" class="dropzone p-10 text-center cursor-pointer mb-6">
-        <p class="text-gray-400 mb-3">${t("drop")}</p>
-        <button type="button" class="btn-primary px-6 py-2.5">${t("select")}</button>
+
+    <div class="card p-6 md:p-8 fade-in">
+      <div id="dropzone" class="dropzone p-12 text-center cursor-pointer mb-6">
+        <div class="text-5xl mb-3">📤</div>
+        <p class="text-muted mb-4 text-lg">${t("drop")}</p>
+        <button type="button" class="btn-primary px-8 py-3 text-base">${t("select")}</button>
         <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp" class="hidden">
       </div>
+
       <div id="previews" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6"></div>
-      <button id="uploadBtn" class="btn-primary w-full py-4 text-lg" disabled>${t("upload")}</button>
-      <div id="progressWrap" class="hidden mt-4">
+
+      <button id="uploadBtn" class="btn-primary w-full py-4 text-lg font-bold" disabled>${t("upload")}</button>
+
+      <div id="progressWrap" class="hidden mt-5">
         <div class="progress-bar"><div id="progressBar"></div></div>
-        <p id="progressText" class="text-center text-sm text-gray-400 mt-2"></p>
+        <p id="progressText" class="text-center text-sm text-muted mt-2"></p>
       </div>
+
       <div id="status" class="mt-4 text-center text-sm"></div>
     </div>
   `;
@@ -127,14 +142,14 @@ function renderPreviews() {
   const c = document.getElementById("previews");
   if (!c) return;
   if (!selectedFiles.length) {
-    c.innerHTML = `<p class="col-span-full text-center text-gray-500 py-4">${t("noImages")}</p>`;
+    c.innerHTML = `<p class="col-span-full text-center text-muted py-6">${t("noImages")}</p>`;
     return;
   }
   c.innerHTML = selectedFiles.map(item => `
-    <div class="relative group">
-      <img src="${item.preview}" class="w-full aspect-square object-cover rounded-xl border border-gray-800">
-      <button onclick="removeFile('${item.id}')" class="absolute top-1 right-1 bg-black/70 text-white w-6 h-6 rounded-full text-xs opacity-0 group-hover:opacity-100">✕</button>
-      <p class="text-xs text-gray-500 mt-1 truncate">${item.file.name}</p>
+    <div class="relative group fade-in">
+      <img src="${item.preview}" class="w-full aspect-square object-cover rounded-2xl border border-border">
+      <button onclick="removeFile('${item.id}')" class="absolute top-2 right-2 bg-black/70 text-white w-7 h-7 rounded-full text-sm opacity-0 group-hover:opacity-100 transition">✕</button>
+      <p class="text-xs text-muted mt-2 truncate px-1">${item.file.name}</p>
     </div>
   `).join("");
 }
@@ -151,7 +166,7 @@ function updateButton() {
 }
 
 async function startUpload() {
-  if (!IMGBB_API_KEY || IMGBB_API_KEY === "ضع_مفتاحك_هنا") {
+  if (!IMGBB_API_KEY || IMGBB_API_KEY.includes("ضع_مفتاحك")) {
     alert(t("keyMissing"));
     return;
   }
@@ -175,7 +190,7 @@ async function startUpload() {
     for (const item of selectedFiles) {
       const form = new FormData();
       form.append("image", item.file);
-      form.append("name", item.file.name);
+      form.append("name", item.file.name.replace(/\.[^/.]+$/, ""));
 
       const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
         method: "POST",
@@ -210,48 +225,63 @@ function renderResults() {
   const data = JSON.parse(raw);
 
   document.getElementById("app").innerHTML = `
-    <div class="text-center mb-6">
-      <h1 class="text-3xl font-bold text-neon mb-2">${t("success")}</h1>
-      <p class="text-gray-400">${data.images.length} ${currentLang === "ar" ? "صورة" : "images"}</p>
+    <div class="text-center mb-8 fade-in">
+      <h1 class="text-4xl font-extrabold text-neon mb-2">${t("success")}</h1>
+      <p class="text-muted">${data.images.length} ${currentLang === "ar" ? "صورة" : "images"}</p>
     </div>
-    <div class="card p-6">
-      <h2 class="font-semibold mb-4">${t("urlsTitle")}</h2>
+
+    <div class="card p-6 md:p-8 fade-in">
+      <h2 class="font-bold text-xl mb-5">${t("urlsTitle")}</h2>
       <div class="space-y-4">
         ${data.images.map(img => `
-          <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-black/40 p-3 rounded-xl">
-            <img src="${img.url}" class="w-16 h-16 object-cover rounded-lg border border-gray-800">
+          <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-bg/50 p-4 rounded-2xl border border-border">
+            <img src="${img.url}" class="w-20 h-20 object-cover rounded-xl border border-border flex-shrink-0">
             <div class="flex-1 min-w-0">
-              <p class="text-sm text-gray-300 truncate">${img.originalName}</p>
-              <p class="text-xs text-gray-500 break-all">${img.url}</p>
+              <p class="font-medium truncate">${img.originalName}</p>
+              <p class="text-xs text-muted break-all mt-1">${img.url}</p>
             </div>
-            <button onclick="copyText('${img.url}')" class="text-neon text-sm border border-neon/40 px-4 py-1.5 rounded-lg whitespace-nowrap">${t("copy")}</button>
+            <button onclick="copyText('${img.url}')" class="text-neon text-sm border border-neon/50 px-5 py-2 rounded-xl whitespace-nowrap hover:bg-neon/10 transition">
+              ${t("copy")}
+            </button>
           </div>
         `).join("")}
       </div>
-      <div class="flex flex-wrap gap-3 mt-6">
-        <button onclick="copyAll()" class="btn-primary px-5 py-2.5">${t("copyAll")}</button>
-        <button onclick="downloadTxt()" class="border border-neon text-neon px-5 py-2.5 rounded-xl">${t("downloadTxt")}</button>
-        <button onclick="location.hash='#upload'" class="border border-gray-600 px-5 py-2.5 rounded-xl">${t("newUpload")}</button>
+
+      <div class="flex flex-wrap gap-3 mt-8">
+        <button onclick="copyAll()" class="btn-primary px-6 py-3">${t("copyAll")}</button>
+        <button onclick="downloadTxt()" class="border-2 border-neon text-neon px-6 py-3 rounded-xl font-semibold hover:bg-neon/10 transition">${t("downloadTxt")}</button>
+        <button onclick="location.hash='#upload'" class="border border-border px-6 py-3 rounded-xl font-medium hover:bg-bg transition">${t("newUpload")}</button>
       </div>
     </div>
   `;
 }
 
-window.copyText = (text) => navigator.clipboard.writeText(text).then(() => alert(currentLang === "ar" ? "تم النسخ" : "Copied"));
+window.copyText = (text) => {
+  navigator.clipboard.writeText(text).then(() => {
+    alert(currentLang === "ar" ? "تم النسخ بنجاح" : "Copied successfully");
+  });
+};
+
 window.copyAll = () => {
   const data = JSON.parse(sessionStorage.getItem("uploadResults"));
-  navigator.clipboard.writeText(data.images.map(i => i.url).join("\n"))
-    .then(() => alert(currentLang === "ar" ? "تم نسخ الكل" : "All copied"));
+  const urls = data.images.map(i => i.url).join("\n");
+  navigator.clipboard.writeText(urls).then(() => {
+    alert(currentLang === "ar" ? "تم نسخ جميع الروابط" : "All URLs copied");
+  });
 };
+
 window.downloadTxt = () => {
   const data = JSON.parse(sessionStorage.getItem("uploadResults"));
-  const blob = new Blob([data.images.map(i => i.url).join("\n")], { type: "text/plain" });
+  const content = data.images.map(i => i.url).join("\n");
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "nexta-urls.txt";
+  a.download = "nexta-link-urls.txt";
   a.click();
 };
 
-window.addEventListener("hashchange", render);
+// Initialize
+applyTheme(currentTheme);
 setLang(currentLang);
+window.addEventListener("hashchange", render);
 render();

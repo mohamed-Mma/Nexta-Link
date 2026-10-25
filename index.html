@@ -3,26 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexta Link — رفع الصور</title>
+  <title>Nexta Link</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-black text-white min-h-screen">
-  <header class="border-b border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-black/80 backdrop-blur z-10">
-    <div class="flex items-center gap-3">
-      <img src="logo.jpg" alt="Nexta" class="h-9 w-auto">
-      <span class="text-xl font-bold tracking-wider text-neon">NEXTA LINK</span>
+<body class="transition-colors duration-300">
+  <header class="border-b border-border sticky top-0 z-20 backdrop-blur-md bg-bg/80">
+    <div class="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="logo.jpg" alt="Nexta" class="h-10 w-auto rounded">
+        <span class="text-2xl font-extrabold tracking-wider text-neon">NEXTA LINK</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="p-2 rounded-full border border-border hover:bg-neon/10 transition" title="Toggle theme">
+          <span id="themeIcon">🌙</span>
+        </button>
+        <button id="langToggle" class="text-sm border border-neon/40 px-3 py-1.5 rounded-full hover:bg-neon/10 transition font-medium">
+          English
+        </button>
+      </div>
     </div>
-    <button id="langToggle" class="text-sm border border-neon/40 px-3 py-1.5 rounded-full hover:bg-neon/10 transition">
-      English
-    </button>
   </header>
 
-  <main id="app" class="max-w-3xl mx-auto px-4 py-10"></main>
+  <main id="app" class="max-w-4xl mx-auto px-5 py-10 min-h-[70vh]"></main>
 
-  <footer class="text-center text-gray-500 text-sm py-8 border-t border-gray-800">
-    © 2026 Nexta — Modern Technology
+  <footer class="border-t border-border py-8 text-center text-sm text-muted">
+    <p>Developed for you by <a href="https://www.facebook.com/profile.php?id=61590223634140" target="_blank" class="text-neon font-bold hover:underline">Nexta</a></p>
   </footer>
 
   <script src="app.js"></script>
