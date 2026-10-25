@@ -1,0 +1,62 @@
+:root {
+  --neon: #b4ff39;
+  --neon-glow: 0 0 24px rgba(180, 255, 57, 0.35);
+}
+
+body {
+  font-family: 'Cairo', 'Inter', system-ui, sans-serif;
+}
+
+.text-neon { color: var(--neon); }
+.bg-neon { background-color: var(--neon); }
+
+.glow { box-shadow: var(--neon-glow); }
+
+.card {
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 16px;
+}
+
+.btn-primary {
+  background: var(--neon);
+  color: #000;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: var(--neon-glow);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropzone {
+  border: 2px dashed #333;
+  border-radius: 16px;
+  transition: all 0.2s;
+}
+
+.dropzone.dragover {
+  border-color: var(--neon);
+  background: rgba(180, 255, 57, 0.06);
+}
+
+.progress-bar {
+  height: 6px;
+  background: #222;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar > div {
+  height: 100%;
+  background: var(--neon);
+  width: 0%;
+  transition: width 0.3s ease;
+}
